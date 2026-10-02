@@ -17,6 +17,7 @@ src/
   sync.odin        `norn sync`: super-project/subproject tree sync via jj
   fetch.odin       source fetching: VCS / tarball / binary tiers + sha256
   deps.odin        dependency resolution: topo order, cycles, core containment
+  build.odin       build pipeline: build.conf, layered overrides, script run
   paths/           sysroot-aware target path resolution
   manifest/        restricted-TOML parser + .pkgsrc schema validation
 ```
@@ -42,7 +43,9 @@ Requires the Odin compiler (https://odin-lang.org).
   from `/etc/norn/config.toml` (implemented, tested)
 - **M4** (done): dependency resolution — topological order, cycles are hard
   errors naming the loop, core-containment check (implemented, tested)
-- **M5**: build pipeline — `/etc/norn/build.conf`, `$PREFIX`, fakeroot shim hook
+- **M5** (done): build pipeline — `/etc/norn/build.conf` profile, layered
+  manifest overrides (replace + append), `$PREFIX`/`$SRCDIR`/toolchain env,
+  POSIX shell script run, `LD_PRELOAD` fakeroot hook (implemented, tested)
 - **M6**: install/remove/purge/upgrade/rollback, priority registry, config-file
   lifecycle, local database under `/var/lib/norn`
 - **M7**: `.pkgsrc` manifests for every alpha core package
