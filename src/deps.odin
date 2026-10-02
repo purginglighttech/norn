@@ -53,7 +53,7 @@ resolve_deps :: proc(requested: []string, opts: ^Deps_Opts) -> (plan: Dep_Plan, 
     manifests := make(map[string]manifest.Manifest)
     defer {
         for _, &m in manifests {
-            manifest_free(&m)
+            manifest.manifest_destroy(&m)
         }
         delete(manifests)
     }
@@ -258,7 +258,7 @@ load_manifest_file :: proc(path: string) -> (m: manifest.Manifest, err: string) 
     if merr.msg != "" {
         return {}, fmt.tprintf("%s: %s: %s", path, merr.field, merr.msg)
     }
-    return manifest_clone(&base), ""
+    return manifest.manifest_clone(&base), ""
 }
 
 // is_core_repo reports whether repo_dir is the core subproject.
@@ -268,70 +268,3 @@ is_core_repo :: proc(repo_dir: string, opts: ^Deps_Opts) -> bool {
     return repo_dir == core
 }
 
-// manifest_clone deep-copies a Manifest (all owned strings).
-manifest_clone :: proc(src: ^manifest.Manifest) -> manifest.Manifest {
-    dst: manifest.Manifest
-    dst.pkg.name = strings.clone(src.pkg.name)
-    dst.pkg.version = strings.clone(src.pkg.version)
-    dst.pkg.description = strings.clone(src.pkg.description)
-    dst.pkg.url = strings.clone(src.pkg.url)
-    dst.pkg.license = strings.clone(src.pkg.license)
-    dst.pkg.priority = src.pkg.priority
-    dst.pkg.release = src.pkg.release
-    dst.repo.present = src.repo.present
-    dst.repo.vcs = strings.clone(src.repo.vcs)
-    dst.repo.url = strings.clone(src.repo.url)
-    dst.repo.branch = strings.clone(src.repo.branch)
-    dst.repo.last_known_tag = strings.clone(src.repo.last_known_tag)
-    dst.repo.last_known_hash = strings.clone(src.repo.last_known_hash)
-    dst.tarball.present = src.tarball.present
-    dst.tarball.url = strings.clone(src.tarball.url)
-    dst.tarball.sha256 = strings.clone(src.tarball.sha256)
-    dst.binary.present = src.binary.present
-    dst.binary.url = strings.clone(src.binary.url)
-    dst.binary.sha256 = strings.clone(src.binary.sha256)
-    dst.deps.build = make([]string, len(src.deps.build))
-    for s, i in src.deps.build {
-        dst.deps.build[i] = strings.clone(s)
-    }
-    dst.deps.run = make([]string, len(src.deps.run))
-    for s, i in src.deps.run {
-        dst.deps.run[i] = strings.clone(s)
-    }
-    // Build_Info has cflags_append []string.
-    dst.build.cflags_append = make([]string, len(src.build.cflags_append))
-    for s, i in src.build.cflags_append {
-        dst.build.cflags_append[i] = strings.clone(s)
-    }
-    return dst
-}
-
-// manifest_free releases a manifest_clone result.
-manifest_free :: proc(m: ^manifest.Manifest) {
-    delete(m.pkg.name)
-    delete(m.pkg.version)
-    delete(m.pkg.description)
-    delete(m.pkg.url)
-    delete(m.pkg.license)
-    delete(m.repo.vcs)
-    delete(m.repo.url)
-    delete(m.repo.branch)
-    delete(m.repo.last_known_tag)
-    delete(m.repo.last_known_hash)
-    delete(m.tarball.url)
-    delete(m.tarball.sha256)
-    delete(m.binary.url)
-    delete(m.binary.sha256)
-    for s in m.deps.build {
-        delete(s)
-    }
-    delete(m.deps.build)
-    for s in m.deps.run {
-        delete(s)
-    }
-    delete(m.deps.run)
-    for s in m.build.cflags_append {
-        delete(s)
-    }
-    delete(m.build.cflags_append)
-}
