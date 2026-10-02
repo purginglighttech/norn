@@ -49,7 +49,7 @@ new_usage :: proc() {
     fmt.println("  --description TEXT   one-line description")
     fmt.println("  --url URL            upstream homepage")
     fmt.println("  --license SPDX       license identifier")
-    fmt.println("  --priority N         live-tree provider priority (default: 50)")
+    fmt.println("  --priority N         live-tree provider priority (default: 0)")
     fmt.println("  --vcs jj|fossil      VCS for the repo tier (default: jj)")
     fmt.println("  --repo URL           source tier: VCS repository")
     fmt.println("  --branch B           VCS branch (default: upstream default)")
@@ -80,7 +80,7 @@ cmd_new :: proc(_: ^Config, args: []string) {
         out      = ".",
         version  = "0.1",
         release  = 1,
-        priority = 50,
+        priority = 0,
         vcs      = "jj",
     }
 
