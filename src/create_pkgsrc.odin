@@ -20,7 +20,7 @@ cmd_create_pkgsrc :: proc(_: ^Config) {
         out      = ".",
         version  = "0.1",
         release  = 1,
-        priority = 50,
+        priority = 0,
         vcs      = "jj",
     }
 
@@ -38,7 +38,7 @@ cmd_create_pkgsrc :: proc(_: ^Config) {
     o.description = ask("one-line description")
     o.url         = ask("homepage URL")
     o.license     = ask("license (SPDX identifier)")
-    o.priority    = ask_int("live-tree provider priority", 50)
+    o.priority    = ask_int("live-tree provider priority", 0)
 
     fmt.println()
     fmt.println("Source tier: norn tries repo first, then tarball, then binary.")
