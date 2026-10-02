@@ -1,0 +1,4 @@
+# norn build output
+/norn
+*.o
+*.a
