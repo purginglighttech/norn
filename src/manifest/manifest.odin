@@ -48,7 +48,20 @@ Dependencies :: struct {
 }
 
 Build_Info :: struct {
-    cflags_append: []string,
+    // Optional per-key replacements for the build.conf toolchain profile.
+    // Empty string = unset (use build.conf). Set = replaces outright.
+    cc:       string,
+    cxx:      string,
+    cflags:   string,
+    cxxflags: string,
+    ldflags:  string,
+    // Appended AFTER override resolution.
+    cflags_append:   []string,
+    cxxflags_append: []string,
+    ldflags_append:  []string,
+    // Inline build script (TOML multi-line string). Required for source
+    // builds; ignored by the binary tier.
+    script: string,
 }
 
 Manifest :: struct {
@@ -184,7 +197,15 @@ manifest_from_doc :: proc(doc: ^Toml_Doc, filename: string) -> (m: Manifest, err
         return m, Manifest_Error{"source.repo.vcs", "non-core VCS client must be declared in dependencies.build"}
     }
 
+    m.build.cc = opt_string(doc, "build.cc")
+    m.build.cxx = opt_string(doc, "build.cxx")
+    m.build.cflags = opt_string(doc, "build.cflags")
+    m.build.cxxflags = opt_string(doc, "build.cxxflags")
+    m.build.ldflags = opt_string(doc, "build.ldflags")
     m.build.cflags_append, _ = opt_str_array(doc, "build.cflags_append")
+    m.build.cxxflags_append, _ = opt_str_array(doc, "build.cxxflags_append")
+    m.build.ldflags_append, _ = opt_str_array(doc, "build.ldflags_append")
+    m.build.script = opt_string(doc, "build.script")
 
     return m, Manifest_Error{}
 }
@@ -253,7 +274,15 @@ manifest_clone :: proc(m: ^Manifest) -> Manifest {
     c.binary.sha256  = strings.clone(m.binary.sha256)
     c.deps.build          = clone_string_array(m.deps.build)
     c.deps.run            = clone_string_array(m.deps.run)
-    c.build.cflags_append = clone_string_array(m.build.cflags_append)
+    c.build.cc            = strings.clone(m.build.cc)
+    c.build.cxx           = strings.clone(m.build.cxx)
+    c.build.cflags        = strings.clone(m.build.cflags)
+    c.build.cxxflags      = strings.clone(m.build.cxxflags)
+    c.build.ldflags       = strings.clone(m.build.ldflags)
+    c.build.cflags_append   = clone_string_array(m.build.cflags_append)
+    c.build.cxxflags_append = clone_string_array(m.build.cxxflags_append)
+    c.build.ldflags_append  = clone_string_array(m.build.ldflags_append)
+    c.build.script        = strings.clone(m.build.script)
     return c
 }
 
@@ -278,7 +307,15 @@ manifest_destroy :: proc(m: ^Manifest) {
     delete(m.binary.sha256)
     free_string_array(m.deps.build)
     free_string_array(m.deps.run)
+    delete(m.build.cc)
+    delete(m.build.cxx)
+    delete(m.build.cflags)
+    delete(m.build.cxxflags)
+    delete(m.build.ldflags)
     free_string_array(m.build.cflags_append)
+    free_string_array(m.build.cxxflags_append)
+    free_string_array(m.build.ldflags_append)
+    delete(m.build.script)
 }
 
 req_string :: proc(doc: ^Toml_Doc, err: ^Manifest_Error, key: string) -> (string, bool) {
