@@ -16,6 +16,7 @@ src/
   create_pkgsrc.odin  `norn --create-pkgsrc`: interactive manifest wizard
   sync.odin        `norn sync`: super-project/subproject tree sync via jj
   fetch.odin       source fetching: VCS / tarball / binary tiers + sha256
+  deps.odin        dependency resolution: topo order, cycles, core containment
   paths/           sysroot-aware target path resolution
   manifest/        restricted-TOML parser + .pkgsrc schema validation
 ```
@@ -39,7 +40,8 @@ Requires the Odin compiler (https://odin-lang.org).
 - **M3** (done): fetch tiers — VCS (jj/fossil; branch/HEAD, fallback to
   last-known-good tag+hash) → tarball → binary, sha256-verified; `fetch_mode`
   from `/etc/norn/config.toml` (implemented, tested)
-- **M4**: dependency resolution — topological order, cycles are hard errors
+- **M4** (done): dependency resolution — topological order, cycles are hard
+  errors naming the loop, core-containment check (implemented, tested)
 - **M5**: build pipeline — `/etc/norn/build.conf`, `$PREFIX`, fakeroot shim hook
 - **M6**: install/remove/purge/upgrade/rollback, priority registry, config-file
   lifecycle, local database under `/var/lib/norn`
