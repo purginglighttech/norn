@@ -18,6 +18,7 @@ src/
   fetch.odin       source fetching: VCS / tarball / binary tiers + sha256
   deps.odin        dependency resolution: topo order, cycles, core containment
   build.odin       build pipeline: build.conf, layered overrides, script run
+  install.odin     install lifecycle: db, symlinks, priority, configs, upgrade
   paths/           sysroot-aware target path resolution
   manifest/        restricted-TOML parser + .pkgsrc schema validation
 ```
@@ -46,8 +47,10 @@ Requires the Odin compiler (https://odin-lang.org).
 - **M5** (done): build pipeline — `/etc/norn/build.conf` profile, layered
   manifest overrides (replace + append), `$PREFIX`/`$SRCDIR`/toolchain env,
   POSIX shell script run, `LD_PRELOAD` fakeroot hook (implemented, tested)
-- **M6**: install/remove/purge/upgrade/rollback, priority registry, config-file
-  lifecycle, local database under `/var/lib/norn`
+- **M6** (done): install lifecycle — local db (`/var/lib/norn`), prefix+
+  symlink model, priority registry (highest wins, ties error), config
+  lifecycle (copy, hash, tombstone on remove, purge), upgrade/rollback
+  with version prefixes (implemented, tested)
 - **M7**: `.pkgsrc` manifests for every alpha core package
 - **M8**: bootstrap — host Odin builds norn; `norn --sysroot` builds the alpha;
   the alpha boots
