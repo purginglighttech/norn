@@ -21,6 +21,7 @@ New_Opts :: struct {
     license:       string,
     priority:      i64,
     tier:          string, // "", "repo", "tarball", "binary"
+    metapkg:	   bool,
     vcs:           string,
     repo_url:      string,
     branch:        string,
@@ -50,6 +51,7 @@ new_usage :: proc() {
     fmt.println("  --url URL            upstream homepage")
     fmt.println("  --license SPDX       license identifier")
     fmt.println("  --priority N         live-tree provider priority (default: 0)")
+    fmt.println("  --metapkg            dependency-only meta-pkg (no source tier")
     fmt.println("  --vcs jj|fossil      VCS for the repo tier (default: jj)")
     fmt.println("  --repo URL           source tier: VCS repository")
     fmt.println("  --branch B           VCS branch (default: upstream default)")
@@ -63,6 +65,7 @@ new_usage :: proc() {
     fmt.println()
     fmt.println("At most one source tier per invocation. With no tier flags,")
     fmt.println("all three tiers are emitted commented out.")
+    fmt.println("--metapkg cannot be combined with any source tier.")
 }
 
 cmd_new :: proc(_: ^Config, args: []string) {
@@ -110,6 +113,8 @@ cmd_new :: proc(_: ^Config, args: []string) {
             o.priority = parse_i64_flag(key, take_value(key, val, has_value, rest, &i))
         case "force":
             o.force = true
+	case "metapkg":
+	    o.metapkg = true
         case "vcs":
             o.vcs = take_value(key, val, has_value, rest, &i)
             o.tier = set_tier(o.tier, "repo")
@@ -150,6 +155,10 @@ cmd_new :: proc(_: ^Config, args: []string) {
 
     // Post-parse validation: the selected tier must be complete, and a
     // --sha256 only makes sense with the tarball or binary tier.
+    if o.metapkg && o.tier != "" {
+	    fmt.eprintln("norn new: --metapkg cannot be combined with a source tier")
+	    os.exit(1)
+    }
     switch o.tier {
     case "repo":
         if o.repo_url == "" {

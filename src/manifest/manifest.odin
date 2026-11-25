@@ -19,6 +19,7 @@ Package_Info :: struct {
     url:         string,
     license:     string,
     priority:    i64,
+    metapkg:	 bool,
 }
 
 Source_Repo :: struct {
@@ -140,11 +141,12 @@ manifest_from_doc :: proc(doc: ^Toml_Doc, filename: string) -> (m: Manifest, err
     m.pkg.url         = opt_string(doc, "package.url")
     m.pkg.license     = opt_string(doc, "package.license")
     m.pkg.priority, _ = opt_int(doc, "package.priority")
+    m.pkg.metapkg, _  = opt_bool(doc, "package.metapkg")
 
     _, has_repo := doc.values["source.repo.vcs"]
     _, has_tb   := doc.values["source.tarball.url"]
     _, has_bin  := doc.values["source.binary.url"]
-    if !has_repo && !has_tb && !has_bin {
+    if !m.pkg.metapkg && !has_repo && !has_tb && !has_bin {
         return m, Manifest_Error{"source", "at least one source tier (repo, tarball, binary) is required"}
     }
 
@@ -365,6 +367,18 @@ opt_int :: proc(doc: ^Toml_Doc, key: string) -> (i64, bool) {
         return 0, false
     }
     return n, true
+}
+
+opt_bool :: proc(doc: ^Toml_Doc, key: string) -> (bool, bool) {
+	v, found := doc.values[key]
+	if !found {
+		return false, false
+	}
+	b, is_bool := v.(bool)
+	if !is_bool {
+		return false, false
+	}
+	return b, true
 }
 
 opt_str_array :: proc(doc: ^Toml_Doc, key: string) -> ([]string, bool) {
