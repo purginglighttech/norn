@@ -10,7 +10,7 @@ NORN_VERSION :: "0.1.0-alpha"
 
 Config :: struct {
     sysroot:       string,
-    create_pkgsrc: bool,
+    create_pltsrc: bool,
     paths:         paths.Context,
 }
 
@@ -19,8 +19,8 @@ main :: proc() {
     rest := parse_global_flags(&cfg, os.args[1:])
     cfg.paths.sysroot = paths.normalize_sysroot(cfg.sysroot)
 
-    if cfg.create_pkgsrc {
-        cmd_create_pkgsrc(&cfg)
+    if cfg.create_pltsrc {
+        cmd_create_pltsrc(&cfg)
         return
     }
 
@@ -76,8 +76,8 @@ parse_global_flags :: proc(cfg: ^Config, args: []string) -> []string {
             }
             cfg.sysroot = args[i + 1]
             i += 2
-        } else if a == "--create-pkgsrc" {
-            cfg.create_pkgsrc = true
+        } else if a == "--create-pltsrc" {
+            cfg.create_pltsrc = true
             i += 1
         } else if strings.has_prefix(a, "--sysroot=") {
             cfg.sysroot = a[len("--sysroot="):]

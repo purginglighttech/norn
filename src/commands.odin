@@ -19,11 +19,11 @@ usage :: proc() {
     fmt.println("  info <pkg>          show a package's manifest details")
     fmt.println("  build <pkg>         build a package without installing it")
     fmt.println("  clean               remove cached sources and build artifacts")
-    fmt.println("  new <name>          scaffold a new <name>.pkgsrc manifest")
+    fmt.println("  new <name>          scaffold a new <name>.pltsrc manifest")
     fmt.println()
     fmt.println("global flags:")
     fmt.println("  --sysroot DIR       build/install into DIR instead of the live system")
-    fmt.println("  --create-pkgsrc     interactively scaffold a <name>.pkgsrc manifest")
+    fmt.println("  --create-pltsrc     interactively scaffold a <name>.pltsrc manifest")
 }
 
 not_implemented :: proc(cmd: string) {

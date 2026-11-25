@@ -1,6 +1,6 @@
-// norn new: scaffold a <name>.pkgsrc manifest from flags.
+// norn new: scaffold a <name>.pltsrc manifest from flags.
 //
-// The scripted counterpart to the interactive `norn --create-pkgsrc`
+// The scripted counterpart to the interactive `norn --create-pltsrc`
 // wizard. Both share the New_Opts struct and the renderer below.
 package main
 
@@ -38,13 +38,13 @@ New_Opts :: struct {
 new_usage :: proc() {
     fmt.println("usage: norn new <name> [flags]")
     fmt.println()
-    fmt.println("Scaffold a <name>.pkgsrc manifest. Flags pre-fill fields;")
+    fmt.println("Scaffold a <name>.pltsrc manifest. Flags pre-fill fields;")
     fmt.println("anything left out is emitted commented for you to fill in.")
-    fmt.println("For a guided walkthrough instead, run: norn --create-pkgsrc")
+    fmt.println("For a guided walkthrough instead, run: norn --create-pltsrc")
     fmt.println()
     fmt.println("flags:")
     fmt.println("  --out DIR            write the file into DIR (default: .)")
-    fmt.println("  --force              overwrite an existing <name>.pkgsrc")
+    fmt.println("  --force              overwrite an existing <name>.pltsrc")
     fmt.println("  --version VER        package version (default: 0.1)")
     fmt.println("  --release N          package release (default: 1)")
     fmt.println("  --description TEXT   one-line description")
@@ -186,13 +186,13 @@ cmd_new :: proc(_: ^Config, args: []string) {
         }
     }
 
-    path := pkgsrc_path(name, o.out)
+    path := pltsrc_path(name, o.out)
     if os.exists(path) && !o.force {
         fmt.eprintf("norn new: '%s' already exists (use --force to overwrite)\n", path)
         os.exit(1)
     }
 
-    text := render_pkgsrc(name, &o)
+    text := render_pltsrc(name, &o)
     defer delete(text)
     if err := os.write_entire_file(path, transmute([]byte)text); err != nil {
         fmt.eprintf("norn new: cannot write '%s': %v\n", path, err)
@@ -204,12 +204,12 @@ cmd_new :: proc(_: ^Config, args: []string) {
     }
 }
 
-// pkgsrc_path resolves the output file for a manifest name and directory.
-pkgsrc_path :: proc(name, out: string) -> string {
+// pltsrc_path resolves the output file for a manifest name and directory.
+pltsrc_path :: proc(name, out: string) -> string {
     if out == "." || out == "" {
-        return fmt.tprintf("%s.pkgsrc", name)
+        return fmt.tprintf("%s.pltsrc", name)
     }
-    return fmt.tprintf("%s/%s.pkgsrc", out, name)
+    return fmt.tprintf("%s/%s.pltsrc", out, name)
 }
 
 // split_flag parses one argv element of the form --key=value or --key value.
@@ -325,16 +325,16 @@ render_str_array :: proc(sb: ^strings.Builder, vals: []string) {
     strings.write_string(sb, "]")
 }
 
-// render_pkgsrc assembles the manifest text. The selected tier is active;
+// render_pltsrc assembles the manifest text. The selected tier is active;
 // the others are emitted commented so the file teaches the schema.
-render_pkgsrc :: proc(name: string, o: ^New_Opts) -> string {
+render_pltsrc :: proc(name: string, o: ^New_Opts) -> string {
     sb: strings.Builder
     strings.builder_init(&sb)
     w := strings.write_string
 
     w(&sb, "# ")
     w(&sb, name)
-    w(&sb, ".pkgsrc - norn package manifest.\n#\n")
+    w(&sb, ".pltsrc - norn package manifest.\n#\n")
     w(&sb, "# Restricted TOML subset: [tables] and subtables, strings, integers,\n")
     w(&sb, "# booleans, arrays of strings. No inline tables, floats, datetimes,\n")
     w(&sb, "# or dotted keys.\n\n")

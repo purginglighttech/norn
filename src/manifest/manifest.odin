@@ -108,14 +108,14 @@ slice_contains :: proc(s: []string, want: string) -> bool {
 
 // manifest_from_doc binds a parsed TOML document to the manifest schema
 // and enforces the validation rules. filename is used to check that
-// package.name matches the <name>.pkgsrc stem.
+// package.name matches the <name>.pltsrc stem.
 //
 // The returned Manifest BORROWS all of its strings and arrays from doc:
 // it owns nothing. doc must outlive m — destroy the document only after
 // the manifest is no longer used. For an owned Manifest, see
 // load_manifest (which returns one via manifest_clone).
 manifest_from_doc :: proc(doc: ^Toml_Doc, filename: string) -> (m: Manifest, err: Manifest_Error) {
-    stem := strings.trim_suffix(filepath.base(filename), ".pkgsrc")
+    stem := strings.trim_suffix(filepath.base(filename), ".pltsrc")
 
     name, ok := req_string(doc, &err, "package.name")
     if !ok {
@@ -212,7 +212,7 @@ manifest_from_doc :: proc(doc: ^Toml_Doc, filename: string) -> (m: Manifest, err
     return m, Manifest_Error{}
 }
 
-// load_manifest reads, parses, and validates a .pkgsrc file.
+// load_manifest reads, parses, and validates a .pltsrc file.
 // The returned Manifest is owned by the caller: release it with
 // manifest_destroy when done.
 load_manifest :: proc(path: string) -> (m: Manifest, err: string) {

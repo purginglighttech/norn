@@ -1,7 +1,7 @@
 // norn deps: dependency resolution.
 //
 // Given package names, loads their manifests from the local ports tree
-// (/usr/ports/<repo>/.../<name>.pkgsrc), builds the dependency graph from
+// (/usr/ports/<repo>/.../<name>.pltsrc), builds the dependency graph from
 // [dependencies] build+run, and returns the install order: topological,
 // dependencies before dependents.
 //
@@ -187,14 +187,14 @@ dep_visit :: proc(ctx: ^Dep_Ctx, name: string) -> string {
     return ""
 }
 
-// load_manifest_for finds <name>.pkgsrc in the enabled subprojects and
+// load_manifest_for finds <name>.pltsrc in the enabled subprojects and
 // parses it. Returns the manifest and the subproject dir holding it.
 // The manifest is owned; the dir string is borrowed from opts.
 load_manifest_for :: proc(name: string, opts: ^Deps_Opts) -> (m: manifest.Manifest, repo_dir: string, err: string) {
     for repo in opts.repos {
         sub, _ := filepath.join([]string{opts.ports_root, repo})
         defer delete(sub)
-        // Walk the subproject for <name>.pkgsrc.
+        // Walk the subproject for <name>.pltsrc.
         found := find_manifest(sub, name)
         if found != "" {
             defer delete(found)
@@ -208,10 +208,10 @@ load_manifest_for :: proc(name: string, opts: ^Deps_Opts) -> (m: manifest.Manife
     return {}, "", fmt.tprintf("package '%s' not found in the ports tree (run 'norn sync'?)", name)
 }
 
-// find_manifest searches dir recursively for <name>.pkgsrc. Returns the
+// find_manifest searches dir recursively for <name>.pltsrc. Returns the
 // path (owned) or "".
 find_manifest :: proc(dir, name: string) -> string {
-    want := fmt.tprintf("%s.pkgsrc", name)
+    want := fmt.tprintf("%s.pltsrc", name)
     // tprintf temp; do NOT delete.
     f, oerr := os.open(dir)
     if oerr != nil {
@@ -240,7 +240,7 @@ find_manifest :: proc(dir, name: string) -> string {
     return ""
 }
 
-// load_manifest_file parses a .pkgsrc file into an owned Manifest.
+// load_manifest_file parses a .pltsrc file into an owned Manifest.
 load_manifest_file :: proc(path: string) -> (m: manifest.Manifest, err: string) {
     data, rerr := os.read_entire_file(path, context.allocator)
     if rerr != nil {

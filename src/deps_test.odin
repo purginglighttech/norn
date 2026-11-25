@@ -28,9 +28,9 @@ deps_work_dir :: proc(t: ^testing.T, tag: string) -> string {
     return strings.clone(dir)
 }
 
-// write_pkgsrc writes a minimal manifest with the given deps.
-write_pkgsrc :: proc(t: ^testing.T, ports_root, repo, name: string, build_deps, run_deps: []string) {
-    path, _ := filepath.join([]string{ports_root, repo, "sys", fmt.tprintf("%s.pkgsrc", name)})
+// write_pltsrc writes a minimal manifest with the given deps.
+write_pltsrc :: proc(t: ^testing.T, ports_root, repo, name: string, build_deps, run_deps: []string) {
+    path, _ := filepath.join([]string{ports_root, repo, "sys", fmt.tprintf("%s.pltsrc", name)})
     defer delete(path)
     sb: strings.Builder
     strings.builder_init(&sb)
@@ -78,9 +78,9 @@ test_deps_linear :: proc(t: ^testing.T) {
     defer delete(root)
     defer os.remove_all(root)
     // app -> lib -> base
-    write_pkgsrc(t, root, "core", "base", {}, {})
-    write_pkgsrc(t, root, "core", "lib", {}, {"base"})
-    write_pkgsrc(t, root, "core", "app", {"lib"}, {})
+    write_pltsrc(t, root, "core", "base", {}, {})
+    write_pltsrc(t, root, "core", "lib", {}, {"base"})
+    write_pltsrc(t, root, "core", "app", {"lib"}, {})
 
     opts := deps_opts(root)
     defer free_deps_opts(&opts)
@@ -103,10 +103,10 @@ test_deps_diamond :: proc(t: ^testing.T) {
     defer delete(root)
     defer os.remove_all(root)
     // app -> {liba, libb} -> base
-    write_pkgsrc(t, root, "core", "base", {}, {})
-    write_pkgsrc(t, root, "core", "liba", {}, {"base"})
-    write_pkgsrc(t, root, "core", "libb", {}, {"base"})
-    write_pkgsrc(t, root, "core", "app", {"liba", "libb"}, {})
+    write_pltsrc(t, root, "core", "base", {}, {})
+    write_pltsrc(t, root, "core", "liba", {}, {"base"})
+    write_pltsrc(t, root, "core", "libb", {}, {"base"})
+    write_pltsrc(t, root, "core", "app", {"liba", "libb"}, {})
 
     opts := deps_opts(root)
     defer free_deps_opts(&opts)
@@ -135,9 +135,9 @@ test_deps_cycle :: proc(t: ^testing.T) {
     defer delete(root)
     defer os.remove_all(root)
     // a -> b -> c -> a
-    write_pkgsrc(t, root, "core", "a", {"b"}, {})
-    write_pkgsrc(t, root, "core", "b", {"c"}, {})
-    write_pkgsrc(t, root, "core", "c", {"a"}, {})
+    write_pltsrc(t, root, "core", "a", {"b"}, {})
+    write_pltsrc(t, root, "core", "b", {"c"}, {})
+    write_pltsrc(t, root, "core", "c", {"a"}, {})
 
     opts := deps_opts(root)
     defer free_deps_opts(&opts)
@@ -154,7 +154,7 @@ test_deps_missing :: proc(t: ^testing.T) {
     root := deps_work_dir(t, "missing")
     defer delete(root)
     defer os.remove_all(root)
-    write_pkgsrc(t, root, "core", "app", {"ghost"}, {})
+    write_pltsrc(t, root, "core", "app", {"ghost"}, {})
 
     opts := deps_opts(root)
     defer free_deps_opts(&opts)
@@ -170,8 +170,8 @@ test_deps_core_containment :: proc(t: ^testing.T) {
     defer delete(root)
     defer os.remove_all(root)
     // core app depends on extra lib: forbidden.
-    write_pkgsrc(t, root, "extra", "lib", {}, {})
-    write_pkgsrc(t, root, "core", "app", {"lib"}, {})
+    write_pltsrc(t, root, "extra", "lib", {}, {})
+    write_pltsrc(t, root, "core", "app", {"lib"}, {})
 
     opts := deps_opts(root)
     defer free_deps_opts(&opts)
@@ -187,8 +187,8 @@ test_deps_extra_on_core_ok :: proc(t: ^testing.T) {
     defer delete(root)
     defer os.remove_all(root)
     // extra app depends on core lib: allowed.
-    write_pkgsrc(t, root, "core", "lib", {}, {})
-    write_pkgsrc(t, root, "extra", "app", {"lib"}, {})
+    write_pltsrc(t, root, "core", "lib", {}, {})
+    write_pltsrc(t, root, "extra", "app", {"lib"}, {})
 
     opts := deps_opts(root)
     defer free_deps_opts(&opts)

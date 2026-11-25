@@ -76,7 +76,7 @@ make_manifest :: proc(name: string) -> manifest.Manifest {
     }
 }
 
-// set_repo assigns heap-owned repo tier strings (so manifest_destroy can free).
+// set_repo assigns heap-owned repo tier strings.
 set_repo :: proc(m: ^manifest.Manifest, vcs, url, branch, tag, hash: string) {
     m.repo = manifest.Source_Repo{
         present         = true,
@@ -253,19 +253,9 @@ test_fetch_git_fallback_tag :: proc(t: ^testing.T) {
     }
 }
 
-// manifest_destroy frees owned manifest strings (test helper).
+// manifest_destroy frees a manually-built test manifest.
 manifest_destroy :: proc(m: ^manifest.Manifest) {
-    delete(m.pkg.name)
-    delete(m.pkg.version)
-    delete(m.repo.vcs)
-    delete(m.repo.url)
-    delete(m.repo.branch)
-    delete(m.repo.last_known_tag)
-    delete(m.repo.last_known_hash)
-    delete(m.tarball.url)
-    delete(m.tarball.sha256)
-    delete(m.binary.url)
-    delete(m.binary.sha256)
+    manifest.manifest_destroy(m)
 }
 
 @(test)

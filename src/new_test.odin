@@ -17,7 +17,7 @@ test_new_renders_valid_manifest :: proc(t: ^testing.T) {
         tier     = "repo",
         repo_url = "https://example.com/sbase",
     }
-    text := render_pkgsrc("sbase", &o)
+    text := render_pltsrc("sbase", &o)
     defer delete(text)
 
     doc, perr := manifest.parse_toml(text)
@@ -26,7 +26,7 @@ test_new_renders_valid_manifest :: proc(t: ^testing.T) {
     if perr.msg != "" {
         return
     }
-    m, merr := manifest.manifest_from_doc(&doc, "sbase.pkgsrc")
+    m, merr := manifest.manifest_from_doc(&doc, "sbase.pltsrc")
     testing.expectf(t, merr.msg == "", "generated manifest should validate, got: %s", merr.msg)
     testing.expect_value(t, m.pkg.name, "sbase")
     testing.expect_value(t, m.pkg.version, "1.2")
@@ -43,7 +43,7 @@ test_new_noncore_vcs_gets_build_dep :: proc(t: ^testing.T) {
         tier     = "repo",
         repo_url = "https://example.com/legacy",
     }
-    text := render_pkgsrc("legacy", &o)
+    text := render_pltsrc("legacy", &o)
     defer delete(text)
 
     testing.expect(t, strings.contains(text, "build = [\"hg\"]"), "hg should be auto-declared in dependencies.build")
@@ -51,7 +51,7 @@ test_new_noncore_vcs_gets_build_dep :: proc(t: ^testing.T) {
     doc, perr := manifest.parse_toml(text)
     defer manifest.toml_doc_destroy(&doc)
     testing.expect(t, perr.msg == "", "generated manifest should parse")
-    _, merr := manifest.manifest_from_doc(&doc, "legacy.pkgsrc")
+    _, merr := manifest.manifest_from_doc(&doc, "legacy.pltsrc")
     testing.expectf(t, merr.msg == "", "non-core VCS with build dep should validate, got: %s", merr.msg)
 }
 
@@ -60,13 +60,13 @@ test_new_noncore_vcs_gets_build_dep :: proc(t: ^testing.T) {
 @(test)
 test_new_no_tier_is_template_only :: proc(t: ^testing.T) {
     o := New_Opts{}
-    text := render_pkgsrc("skeleton", &o)
+    text := render_pltsrc("skeleton", &o)
     defer delete(text)
 
     doc, perr := manifest.parse_toml(text)
     defer manifest.toml_doc_destroy(&doc)
     testing.expect(t, perr.msg == "", "template should parse")
-    _, merr := manifest.manifest_from_doc(&doc, "skeleton.pkgsrc")
+    _, merr := manifest.manifest_from_doc(&doc, "skeleton.pltsrc")
     testing.expect(t, merr.msg != "", "template without a tier must fail validation")
 }
 

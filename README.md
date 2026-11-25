@@ -12,15 +12,10 @@ follows it; the spec is the authority when they disagree.
 src/
   main.odin        CLI entry, global flags (--sysroot), subcommand dispatch
   commands.odin    subcommand implementations (stubs until their milestone)
-  new.odin         `norn new`: scaffold a <name>.pkgsrc manifest from flags
-  create_pkgsrc.odin  `norn --create-pkgsrc`: interactive manifest wizard
-  sync.odin        `norn sync`: super-project/subproject tree sync via jj
-  fetch.odin       source fetching: VCS / tarball / binary tiers + sha256
-  deps.odin        dependency resolution: topo order, cycles, core containment
-  build.odin       build pipeline: build.conf, layered overrides, script run
-  install.odin     install lifecycle: db, symlinks, priority, configs, upgrade
+  new.odin         `norn new`: scaffold a <name>.pltsrc manifest from flags
+  create_pltsrc.odin  `norn --create-pltsrc`: interactive manifest wizard
   paths/           sysroot-aware target path resolution
-  manifest/        restricted-TOML parser + .pkgsrc schema validation
+  manifest/        restricted-TOML parser + .pltsrc schema validation
 ```
 
 ## Build
@@ -34,24 +29,16 @@ Requires the Odin compiler (https://odin-lang.org).
 
 ## Milestones
 
-- **M1** (done): manifest parsing + validation, CLI skeleton, sysroot paths,
-  `norn new` / `norn --create-pkgsrc` manifest scaffolding (implemented, tested)
-- **M2** (done): repo management — `norn sync` via jj, `/usr/ports/<repo>/` layout,
-  super-project pins (`--pin`/`--unpin`), pin recorded at `/etc/norn/ports.pin`
-  (implemented, tested)
-- **M3** (done): fetch tiers — VCS (jj/fossil; branch/HEAD, fallback to
-  last-known-good tag+hash) → tarball → binary, sha256-verified; `fetch_mode`
-  from `/etc/norn/config.toml` (implemented, tested)
-- **M4** (done): dependency resolution — topological order, cycles are hard
-  errors naming the loop, core-containment check (implemented, tested)
-- **M5** (done): build pipeline — `/etc/norn/build.conf` profile, layered
-  manifest overrides (replace + append), `$PREFIX`/`$SRCDIR`/toolchain env,
-  POSIX shell script run, `LD_PRELOAD` fakeroot hook (implemented, tested)
-- **M6** (done): install lifecycle — local db (`/var/lib/norn`), prefix+
-  symlink model, priority registry (highest wins, ties error), config
-  lifecycle (copy, hash, tombstone on remove, purge), upgrade/rollback
-  with version prefixes (implemented, tested)
-- **M7**: `.pkgsrc` manifests for every alpha core package
+- **M1** (in progress): manifest parsing + validation, CLI skeleton, sysroot paths,
+  `norn new` / `norn --create-pltsrc` manifest scaffolding (implemented, tested)
+- **M2**: repo management — `norn sync` via jj, `/usr/ports/<repo>/` layout
+- **M3**: fetch tiers — VCS (HEAD, fallback to last-known-good) → tarball → binary,
+  with hash verification
+- **M4**: dependency resolution — topological order, cycles are hard errors
+- **M5**: build pipeline — `/etc/norn/build.conf`, `$PREFIX`, fakeroot shim hook
+- **M6**: install/remove/purge/upgrade/rollback, priority registry, config-file
+  lifecycle, local database under `/var/lib/norn`
+- **M7**: `.pltsrc` manifests for every alpha core package
 - **M8**: bootstrap — host Odin builds norn; `norn --sysroot` builds the alpha;
   the alpha boots
 
