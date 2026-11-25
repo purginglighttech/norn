@@ -199,7 +199,7 @@ cmd_new :: proc(_: ^Config, args: []string) {
         os.exit(1)
     }
     fmt.printf("wrote %s\n", path)
-    if o.tier == "" {
+    if o.tier == "" && !o.metapkg {
         fmt.println("no source tier selected: uncomment one tier before building.")
     }
 }
@@ -354,7 +354,14 @@ render_pltsrc :: proc(name: string, o: ^New_Opts) -> string {
     w(&sb, "\n# Live-tree provider priority: higher wins when two packages ship\n")
     w(&sb, "# the same path. Distro default is 50.\n")
     fmt.sbprintf(&sb, "priority = %d\n", o.priority)
+    if o.metapkg {
+	    w(&sb, "metapkg = true # dependency-only pkg, no source build\n")
+    }
 
+    if o.metapkg {
+	    w(&sb, "\n# --- source ----------------------------------------------------\n")
+    w(&sb, "# metapkg: no source tiers.  The [dependencies] below are the payload.\n")
+    } else {
     w(&sb, "\n# --- source ----------------------------------------------------\n")
     w(&sb, "# Declare the primary tier here. Fallback tiers can be added later;\n")
     w(&sb, "# norn tries them in priority order: repo, then tarball, then binary.\n\n")
@@ -364,6 +371,7 @@ render_pltsrc :: proc(name: string, o: ^New_Opts) -> string {
     render_tarball_tier(&sb, o)
     w(&sb, "\n")
     render_binary_tier(&sb, o)
+    }
 
     // A non-core VCS client must be installed before fetching, so it is
     // declared in dependencies.build automatically. vcs_dep is procedure-
@@ -387,12 +395,14 @@ render_pltsrc :: proc(name: string, o: ^New_Opts) -> string {
     render_str_array(&sb, o.deps_run)
     w(&sb, "\n")
 
-    w(&sb, "\n[build]\n")
+    if !o.metapkg {
+	    w(&sb, "\n[build]\n")
     w(&sb, "# Extra flags appended to the system build profile (/etc/norn/build.conf).\n")
     w(&sb, "# Distro policy is authoritative: manifests may append, never replace.\n")
     w(&sb, "cflags_append = ")
     render_str_array(&sb, o.cflags_append)
     w(&sb, "\n")
+    }
 
     return strings.to_string(sb)
 }

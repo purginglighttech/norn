@@ -39,14 +39,19 @@ cmd_create_pltsrc :: proc(_: ^Config) {
     o.url         = ask("homepage URL")
     o.license     = ask("license (SPDX identifier)")
     o.priority    = ask_int("live-tree provider priority", 0)
+    o.metapkg     = ask_yes_no("meta-package (dependencies only, no source)", false)
 
     fmt.println()
     fmt.println("Source tier: norn tries repo first, then tarball, then binary.")
-    ask_source_tier(&o)
+    if !o.metapkg {
+	    ask_source_tier(&o)
+    }
 
     o.deps_build    = split_csv(ask("build dependencies (comma-separated)"))
     o.deps_run      = split_csv(ask("runtime dependencies (comma-separated)"))
-    o.cflags_append = split_csv(ask("extra CFLAGS to append (comma-separated)"))
+    if !o.metapkg {
+	    o.cflags_append = split_csv(ask("extra CFLAGS to append (comma-separated)"))
+    }
 
     o.out = ask("output directory", ".")
 
@@ -66,7 +71,7 @@ cmd_create_pltsrc :: proc(_: ^Config) {
         os.exit(1)
     }
     fmt.printf("wrote %s\n", path)
-    if o.tier == "" {
+    if o.tier == "" && !o.metapkg {
         fmt.println("no source tier selected: uncomment one tier before building.")
     }
 }
