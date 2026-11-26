@@ -424,18 +424,18 @@ render_repo_tier :: proc(sb: ^strings.Builder, o: ^New_Opts) {
             w(sb, "# branch = \"main\"\n")
         }
         if o.tag != "" {
-            w(sb, "last_known_tag = ")
+            w(sb, "last_known.tag = ")
             toml_write_escaped(sb, o.tag)
             w(sb, "\n")
         } else {
-            w(sb, "# last_known_tag = \"\"    # fallback tag if HEAD fails to build\n")
+            w(sb, "# last_known.tag = \"\"    # fallback tag if HEAD fails to build\n")
         }
         if o.hash != "" {
-            w(sb, "last_known_hash = ")
+            w(sb, "last_known.hash = ")
             toml_write_escaped(sb, o.hash)
             w(sb, "\n")
         } else {
-            w(sb, "# last_known_hash = \"\"  # expected hash of the fallback tag\n")
+            w(sb, "# last_known.hash = \"\"  # expected hash of the fallback tag\n")
         }
         return
     }
@@ -443,8 +443,8 @@ render_repo_tier :: proc(sb: ^strings.Builder, o: ^New_Opts) {
     w(sb, "# vcs = \"git\"              # core: git, fossil - others need a build dep\n")
     w(sb, "# url = \"\"\n")
     w(sb, "# branch = \"main\"\n")
-    w(sb, "# last_known_tag = \"\"    # fallback tag if HEAD fails to build\n")
-    w(sb, "# last_known_hash = \"\"  # expected hash of the fallback tag\n")
+    w(sb, "# last_known.tag = \"\"    # fallback tag if HEAD fails to build\n")
+    w(sb, "# last_known.hash = \"\"  # expected hash of the fallback tag\n")
 }
 
 render_tarball_tier :: proc(sb: ^strings.Builder, o: ^New_Opts) {

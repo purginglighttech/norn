@@ -27,8 +27,8 @@ Source_Repo :: struct {
     vcs:             string,
     url:             string,
     branch:          string,
-    last_known_tag:  string,
-    last_known_hash: string,
+    last_known.tag:  string,
+    last_known.hash: string,
 }
 
 Source_Tarball :: struct {
@@ -164,8 +164,8 @@ manifest_from_doc :: proc(doc: ^Toml_Doc, filename: string) -> (m: Manifest, err
             return m, err
         }
         m.repo.branch          = opt_string(doc, "source.repo.branch")
-        m.repo.last_known_tag  = opt_string(doc, "source.repo.last_known_tag")
-        m.repo.last_known_hash = opt_string(doc, "source.repo.last_known_hash")
+        m.repo.last_known.tag  = opt_string(doc, "source.repo.last_known.tag")
+        m.repo.last_known.hash = opt_string(doc, "source.repo.last_known.hash")
     }
     if has_tb {
         m.tarball.present = true
@@ -268,8 +268,8 @@ manifest_clone :: proc(m: ^Manifest) -> Manifest {
     c.repo.vcs             = strings.clone(m.repo.vcs)
     c.repo.url             = strings.clone(m.repo.url)
     c.repo.branch          = strings.clone(m.repo.branch)
-    c.repo.last_known_tag  = strings.clone(m.repo.last_known_tag)
-    c.repo.last_known_hash = strings.clone(m.repo.last_known_hash)
+    c.repo.last_known.tag  = strings.clone(m.repo.last_known.tag)
+    c.repo.last_known.hash = strings.clone(m.repo.last_known.hash)
     c.tarball.url    = strings.clone(m.tarball.url)
     c.tarball.sha256 = strings.clone(m.tarball.sha256)
     c.binary.url     = strings.clone(m.binary.url)
@@ -301,8 +301,8 @@ manifest_destroy :: proc(m: ^Manifest) {
     delete(m.repo.vcs)
     delete(m.repo.url)
     delete(m.repo.branch)
-    delete(m.repo.last_known_tag)
-    delete(m.repo.last_known_hash)
+    delete(m.repo.last_known.tag)
+    delete(m.repo.last_known.hash)
     delete(m.tarball.url)
     delete(m.tarball.sha256)
     delete(m.binary.url)

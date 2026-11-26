@@ -83,8 +83,8 @@ set_repo :: proc(m: ^manifest.Manifest, vcs, url, branch, tag, hash: string) {
         vcs             = strings.clone(vcs),
         url             = strings.clone(url),
         branch          = strings.clone(branch),
-        last_known_tag  = strings.clone(tag),
-        last_known_hash = strings.clone(hash),
+        last_known.tag  = strings.clone(tag),
+        last_known.hash = strings.clone(hash),
     }
 }
 
