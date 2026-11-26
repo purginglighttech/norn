@@ -21,7 +21,7 @@ cmd_create_pltsrc :: proc(_: ^Config) {
         version  = "0.1",
         release  = 1,
         priority = 0,
-        vcs      = "jj",
+        vcs      = "git",
     }
 
     name: string
@@ -83,7 +83,7 @@ ask_source_tier :: proc(o: ^New_Opts) {
     case "repo":
         o.tier = "repo"
         for {
-            o.vcs = ask("VCS", "jj")
+            o.vcs = ask("VCS", "git")
             if manifest.is_known_vcs(o.vcs) {
                 break
             }

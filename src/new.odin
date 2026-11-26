@@ -52,7 +52,7 @@ new_usage :: proc() {
     fmt.println("  --license SPDX       license identifier")
     fmt.println("  --priority N         live-tree provider priority (default: 0)")
     fmt.println("  --metapkg            dependency-only meta-pkg (no source tier")
-    fmt.println("  --vcs jj|fossil      VCS for the repo tier (default: jj)")
+    fmt.println("  --vcs git|fossil      VCS for the repo tier (default: git)")
     fmt.println("  --repo URL           source tier: VCS repository")
     fmt.println("  --branch B           VCS branch (default: upstream default)")
     fmt.println("  --tag T --hash H     last-known-good fallback for the repo tier")
@@ -84,7 +84,7 @@ cmd_new :: proc(_: ^Config, args: []string) {
         version  = "0.1",
         release  = 1,
         priority = 0,
-        vcs      = "jj",
+        vcs      = "git",
     }
 
     rest := args[1:]
@@ -440,7 +440,7 @@ render_repo_tier :: proc(sb: ^strings.Builder, o: ^New_Opts) {
         return
     }
     w(sb, "# [source.repo]\n")
-    w(sb, "# vcs = \"jj\"              # core: jj, fossil - others need a build dep\n")
+    w(sb, "# vcs = "git"              # core: git, fossil - others need a build dep\n")
     w(sb, "# url = \"\"\n")
     w(sb, "# branch = \"main\"\n")
     w(sb, "# last_known_tag = \"\"    # fallback tag if HEAD fails to build\n")
