@@ -13,7 +13,7 @@ test_new_renders_valid_manifest :: proc(t: ^testing.T) {
         version  = "1.2",
         release  = 1,
         priority = 50,
-        vcs      = "jj",
+        vcs      = "git",
         tier     = "repo",
         repo_url = "https://example.com/sbase",
     }
@@ -24,14 +24,14 @@ test_new_renders_valid_manifest :: proc(t: ^testing.T) {
     defer manifest.toml_doc_destroy(&doc)
     testing.expectf(t, perr.msg == "", "generated manifest should parse, got: %s", perr.msg)
     if perr.msg != "" {
-        return
+	    return
     }
     m, merr := manifest.manifest_from_doc(&doc, "sbase.pltsrc")
     testing.expectf(t, merr.msg == "", "generated manifest should validate, got: %s", merr.msg)
     testing.expect_value(t, m.pkg.name, "sbase")
     testing.expect_value(t, m.pkg.version, "1.2")
     testing.expect_value(t, m.repo.present, true)
-    testing.expect_value(t, m.repo.vcs, "jj")
+    testing.expect_value(t, m.repo.vcs, "git")
     testing.expect_value(t, m.repo.url, "https://example.com/sbase")
 }
 

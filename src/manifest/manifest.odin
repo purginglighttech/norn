@@ -8,7 +8,7 @@ import "core:strings"
 // Recognized VCS values. Only git and fossil ship in the distro core;
 // anything else must be declared in dependencies.build so the client is
 // installed before norn tries to fetch with it.
-KNOWN_VCS :: []string{"git", "fossil", "git", "hg", "bzr", "darcs", "svn"}
+KNOWN_VCS :: []string{"git", "fossil", "hg", "bzr", "darcs", "svn"}
 CORE_VCS  :: []string{"git", "fossil"}
 
 Package_Info :: struct {

@@ -440,7 +440,7 @@ render_repo_tier :: proc(sb: ^strings.Builder, o: ^New_Opts) {
         return
     }
     w(sb, "# [source.repo]\n")
-    w(sb, "# vcs = "git"              # core: git, fossil - others need a build dep\n")
+    w(sb, "# vcs = \"git\"              # core: git, fossil - others need a build dep\n")
     w(sb, "# url = \"\"\n")
     w(sb, "# branch = \"main\"\n")
     w(sb, "# last_known_tag = \"\"    # fallback tag if HEAD fails to build\n")
