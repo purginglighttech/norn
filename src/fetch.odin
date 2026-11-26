@@ -72,8 +72,8 @@ fetch_source :: proc(m: ^manifest.Manifest, fetch_mode: string, opts: ^Fetch_Opt
 }
 
 // fetch_vcs clones the repo tier via jj (git) or fossil and checks out the
-// manifest's branch (or HEAD). On failure it falls back to last_known.tag
-// inside the tier, verifying last_known.hash when the manifest records one.
+// manifest's branch (or HEAD). On failure it falls back to last_known_tag
+// inside the tier, verifying last_known_hash when the manifest records one.
 fetch_vcs :: proc(m: ^manifest.Manifest, dest: string, opts: ^Fetch_Opts) -> string {
     if os.exists(dest) {
         return fmt.tprintf("fetch: '%s' already exists", dest)
@@ -102,16 +102,16 @@ fetch_git :: proc(m: ^manifest.Manifest, dest: string, opts: ^Fetch_Opts) -> str
     } else {
         append(&revs, "trunk()")
     }
-    have_fallback := m.repo.last_known.tag != ""
+    have_fallback := m.repo.last_known_tag != ""
     if have_fallback {
-        append(&revs, m.repo.last_known.tag)
+        append(&revs, m.repo.last_known_tag)
     }
     last_err: string
     for rev in revs {
         if e := run_cmd(opts.jj_bin, dest, []string{"new", rev}); e == "" {
             // When we fell back to the tag, verify the recorded hash.
-            if have_fallback && rev == m.repo.last_known.tag && m.repo.last_known.hash != "" {
-                if ve := verify_jj_hash(opts.jj_bin, dest, m.repo.last_known.hash); ve != "" {
+            if have_fallback && rev == m.repo.last_known_tag && m.repo.last_known_hash != "" {
+                if ve := verify_jj_hash(opts.jj_bin, dest, m.repo.last_known_hash); ve != "" {
                     return ve
                 }
             }
@@ -121,7 +121,7 @@ fetch_git :: proc(m: ^manifest.Manifest, dest: string, opts: ^Fetch_Opts) -> str
         }
     }
     if have_fallback {
-        return fmt.tprintf("fetch: branch/HEAD and fallback tag '%s' both failed: %s", m.repo.last_known.tag, last_err)
+        return fmt.tprintf("fetch: branch/HEAD and fallback tag '%s' both failed: %s", m.repo.last_known_tag, last_err)
     }
     return fmt.tprintf("fetch: checkout failed: %s", last_err)
 }
@@ -142,7 +142,7 @@ verify_jj_hash :: proc(jj_bin, dir, want_hash: string) -> string {
 }
 
 // fetch_fossil clones and opens a fossil repo: the manifest's branch (or
-// trunk), falling back to last_known.tag inside the tier.
+// trunk), falling back to last_known_tag inside the tier.
 fetch_fossil :: proc(m: ^manifest.Manifest, dest: string, opts: ^Fetch_Opts) -> string {
     // tprintf temp; do NOT delete.
     fossil_file := fmt.tprintf("%s.fossil", dest)
@@ -157,10 +157,10 @@ fetch_fossil :: proc(m: ^manifest.Manifest, dest: string, opts: ^Fetch_Opts) -> 
         return run_cmd(bin, dir, []string{"open", fossil_file, rev, "--workdir", dest})
     }
     if e := open(opts.fossil_bin, filepath.dir(dest), fossil_file, rev, dest); e != "" {
-        if m.repo.last_known.tag == "" {
+        if m.repo.last_known_tag == "" {
             return fmt.tprintf("fetch: fossil open failed: %s", e)
         }
-        if e2 := open(opts.fossil_bin, filepath.dir(dest), fossil_file, m.repo.last_known.tag, dest); e2 != "" {
+        if e2 := open(opts.fossil_bin, filepath.dir(dest), fossil_file, m.repo.last_known_tag, dest); e2 != "" {
             return fmt.tprintf("fetch: fossil open failed (primary and fallback): %s", e2)
         }
     }
